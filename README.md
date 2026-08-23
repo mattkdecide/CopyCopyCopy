@@ -26,6 +26,8 @@ By Matt Kain.
 - Paste (`Ctrl+V`/`Cmd+V`) anywhere, any time — it's a normal clipboard paste.
 - Once you paste **inside a browser tab**, the buffer auto-clears so your next
   copy starts a fresh chain instead of tacking onto the old one.
+- If you paste somewhere the extension can't see (see below), click
+  **Clear buffer** in the toolbar popup to start fresh manually.
 
 ## Known limitations
 
@@ -33,12 +35,11 @@ By Matt Kain.
   made inside the browser. Copying from Finder, Terminal, Word, a PDF viewer,
   etc. won't append — it'll replace the clipboard as normal, since those apps
   are outside what a browser extension can see.
-- **Auto-clear is also browser-only, and there's no manual reset.** If you
-  paste into another app (which is the whole point, most of the time), the
-  extension never sees that paste, so the buffer keeps growing and the *next*
-  in-browser copy will append onto whatever's still there. There's no
-  "Clear buffer" button anymore — clearing only happens via an in-browser
-  paste.
+- **Auto-clear is also browser-only.** If you paste into another app (which
+  is the whole point, most of the time), the extension never sees that paste,
+  so the buffer keeps growing and the *next* in-browser copy will append onto
+  whatever's still there. Use the **Clear buffer** button in the popup to
+  reset it manually when that happens.
 - **Selection-based.** It hooks the page's `copy` event and reads the current
   text selection, so it works on ordinary web text. It won't work on
   canvas/WebGL-rendered editors (e.g. Google Docs) or on copying non-text

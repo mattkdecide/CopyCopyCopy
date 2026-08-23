@@ -7,6 +7,7 @@ const preview = document.getElementById("preview");
 const stats = document.getElementById("stats");
 const separatorSelect = document.getElementById("separator");
 const customSeparator = document.getElementById("customSeparator");
+const clearBuffer = document.getElementById("clearBuffer");
 
 const KNOWN_SEPARATORS = ["\n\n", "\n", " "];
 
@@ -43,6 +44,10 @@ separatorSelect.addEventListener("change", () => {
 
 customSeparator.addEventListener("input", () => {
   chrome.storage.local.set({ [SEPARATOR_KEY]: customSeparator.value });
+});
+
+clearBuffer.addEventListener("click", () => {
+  chrome.storage.local.set({ [BUFFER_KEY]: "", [COUNT_KEY]: 0 });
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
