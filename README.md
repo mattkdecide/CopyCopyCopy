@@ -5,6 +5,10 @@ appends to one growing clipboard buffer instead of replacing it. Copy several
 things in a row, then paste the combined result wherever you want. No account,
 no tracking, no cost — just a `copy` event listener and `chrome.storage.local`.
 
+Want this system-wide instead of just in the browser? See the
+**[macOS menu bar app](mac-app/README.md)** — same idea, but works in every
+Mac app.
+
 By Matt Kain.
 
 ## Download & install
