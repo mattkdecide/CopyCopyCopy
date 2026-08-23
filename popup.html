@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CopyCopyCopy</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>CopyCopyCopy</h1>
+      <span id="stats"></span>
+    </header>
+
+    <textarea id="preview" spellcheck="false" placeholder="Copy something on any page — it'll show up here."></textarea>
+
+    <div class="row">
+      <label for="separator">Join segments with</label>
+      <select id="separator">
+        <option value="\n\n">Blank line</option>
+        <option value="\n">New line</option>
+        <option value=" ">Space</option>
+        <option value="custom">Custom…</option>
+      </select>
+      <input id="customSeparator" type="text" placeholder="separator" hidden />
+    </div>
+
+    <p class="hint">CopyCopyCopy, then Paste. By Matt Kain</p>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
