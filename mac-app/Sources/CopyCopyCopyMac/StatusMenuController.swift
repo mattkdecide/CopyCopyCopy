@@ -1,21 +1,30 @@
 import AppKit
 
-/// Owns the menu bar (NSStatusItem) icon and its dropdown menu: a live
-/// segment-count badge, a truncated preview of the buffer, the separator
-/// picker, and a manual "Clear buffer" item. Auto-clear-on-paste also runs,
-/// but pasting outside the browser/app sandbox this watches, or without
-/// Input Monitoring permission granted, won't trigger it — the menu item is
-/// the reliable fallback.
+/// Owns the menu bar (NSStatusItem) icon and its dropdown menu: a
+/// pause/resume toggle, a live segment-count badge, a truncated preview of
+/// the buffer, the separator picker, and a manual "Clear buffer" item.
+/// Auto-clear-on-paste also runs, but pasting outside the browser/app
+/// sandbox this watches, or without Input Monitoring permission granted,
+/// won't trigger it — the menu item is the reliable fallback.
 final class StatusMenuController {
     private static let previewCharacterLimit = 200
 
     private let statusItem: NSStatusItem
     private let buffer: ClipboardBuffer
     private let onClearBuffer: () -> Void
+    private let onToggleEnabled: () -> Void
+    private var isEnabled: Bool
 
-    init(buffer: ClipboardBuffer, onClearBuffer: @escaping () -> Void) {
+    init(
+        buffer: ClipboardBuffer,
+        isEnabled: Bool,
+        onClearBuffer: @escaping () -> Void,
+        onToggleEnabled: @escaping () -> Void
+    ) {
         self.buffer = buffer
+        self.isEnabled = isEnabled
         self.onClearBuffer = onClearBuffer
+        self.onToggleEnabled = onToggleEnabled
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.image = NSImage(
             systemSymbolName: "doc.on.clipboard",
@@ -30,12 +39,35 @@ final class StatusMenuController {
         rebuildMenu()
     }
 
+    /// Called by the app delegate right after a toggle, so the checkmark,
+    /// title, and menu label update immediately instead of waiting for the
+    /// next buffer change.
+    func setEnabled(_ enabled: Bool) {
+        isEnabled = enabled
+        refresh()
+    }
+
     private func updateStatusTitle() {
+        guard isEnabled else {
+            statusItem.button?.title = " ⏸"
+            return
+        }
         statusItem.button?.title = buffer.count > 0 ? " \(buffer.count)" : ""
     }
 
     private func rebuildMenu() {
         let menu = NSMenu()
+
+        let toggleItem = NSMenuItem(
+            title: isEnabled ? "Pause Copying" : "Resume Copying",
+            action: #selector(toggleEnabled),
+            keyEquivalent: "c"
+        )
+        toggleItem.keyEquivalentModifierMask = [.control, .command]
+        toggleItem.target = self
+        menu.addItem(toggleItem)
+
+        menu.addItem(.separator())
 
         let statsItem = NSMenuItem(
             title: "\(buffer.count) segment\(buffer.count == 1 ? "" : "s") · \(buffer.text.count) chars",
@@ -102,6 +134,10 @@ final class StatusMenuController {
 
     @objc private func clearBuffer() {
         onClearBuffer()
+    }
+
+    @objc private func toggleEnabled() {
+        onToggleEnabled()
     }
 
     @objc private func quit() {
