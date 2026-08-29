@@ -48,6 +48,9 @@ customSeparator.addEventListener("input", () => {
 
 clearBuffer.addEventListener("click", () => {
   chrome.storage.local.set({ [BUFFER_KEY]: "", [COUNT_KEY]: 0 });
+  navigator.clipboard.writeText("").catch((err) => {
+    console.error("CopyCopyCopy: failed to purge clipboard", err);
+  });
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {

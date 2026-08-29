@@ -47,17 +47,19 @@ This produces `CopyCopyCopy.app` in this folder.
 - Copy things as usual, anywhere — Finder filenames, Terminal output,
   Pages, Mail, PDFs, whatever. Each copy appends to the buffer and the
   combined text is written back to your clipboard.
-- Click the menu bar icon to see the segment count and a preview, and to
-  change the separator joining segments (blank line / new line / space).
-- Paste anywhere — the buffer clears itself automatically.
+- Click the menu bar icon to see the segment count and a preview, change
+  the separator joining segments (blank line / new line / space), or hit
+  **Clear buffer** to purge the buffer and the system clipboard immediately.
+- Paste anywhere — with Input Monitoring granted, the buffer also clears
+  itself automatically. Either way purges the real clipboard, not just the
+  segment count.
 
 ## Known limitations
 
 - **Text only.** Like the browser extension, it reads the clipboard as
   plain text — copying images or files won't append.
 - **Input Monitoring is required for auto-clear.** Without it, the buffer
-  only grows; there's no manual "Clear buffer" button by design, since
-  auto-clear-on-paste replaces it.
+  only grows on its own — use **Clear buffer** in the menu instead.
 - **Unsigned build.** No Apple Developer account was used, so there's a
   one-time Gatekeeper warning on first launch (see Install above).
 

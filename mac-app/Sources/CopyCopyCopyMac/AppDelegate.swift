@@ -9,7 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory) // menu bar only, no Dock icon
 
-        statusMenu = StatusMenuController(buffer: buffer)
+        statusMenu = StatusMenuController(buffer: buffer, onClearBuffer: { [weak self] in self?.performClearBuffer() })
         buffer.onChange = { [weak self] in self?.statusMenu?.refresh() }
 
         clipboardWatcher = ClipboardWatcher { [weak self] copiedText in
@@ -22,7 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         clipboardWatcher?.start()
 
         pasteWatcher = PasteWatcher { [weak self] in
-            self?.buffer.clear()
+            self?.performClearBuffer()
         }
         pasteWatcher?.start()
     }
@@ -30,5 +30,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         clipboardWatcher?.stop()
         pasteWatcher?.stop()
+    }
+
+    /// Resets the buffer's internal state AND purges the real system
+    /// clipboard. Clearing only `buffer` (as the paste-triggered path used
+    /// to do) left the last combined text sitting in NSPasteboard forever —
+    /// this is the single place both the menu item and auto-clear-on-paste
+    /// route through now, so neither one can drift out of sync again.
+    private func performClearBuffer() {
+        buffer.clear()
+        NSPasteboard.general.clearContents()
+        clipboardWatcher?.recordSelfWrite()
     }
 }

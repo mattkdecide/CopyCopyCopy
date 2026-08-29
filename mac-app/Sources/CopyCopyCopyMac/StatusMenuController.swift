@@ -1,17 +1,21 @@
 import AppKit
 
 /// Owns the menu bar (NSStatusItem) icon and its dropdown menu: a live
-/// segment-count badge, a truncated preview of the buffer, and the
-/// separator picker. No "Clear buffer" item and no hotkey by design —
-/// the buffer clears itself automatically on paste.
+/// segment-count badge, a truncated preview of the buffer, the separator
+/// picker, and a manual "Clear buffer" item. Auto-clear-on-paste also runs,
+/// but pasting outside the browser/app sandbox this watches, or without
+/// Input Monitoring permission granted, won't trigger it — the menu item is
+/// the reliable fallback.
 final class StatusMenuController {
     private static let previewCharacterLimit = 200
 
     private let statusItem: NSStatusItem
     private let buffer: ClipboardBuffer
+    private let onClearBuffer: () -> Void
 
-    init(buffer: ClipboardBuffer) {
+    init(buffer: ClipboardBuffer, onClearBuffer: @escaping () -> Void) {
         self.buffer = buffer
+        self.onClearBuffer = onClearBuffer
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.image = NSImage(
             systemSymbolName: "doc.on.clipboard",
@@ -64,6 +68,11 @@ final class StatusMenuController {
         menu.addItem(separatorItem)
 
         menu.addItem(.separator())
+        let clearItem = NSMenuItem(title: "Clear buffer", action: #selector(clearBuffer), keyEquivalent: "")
+        clearItem.target = self
+        menu.addItem(clearItem)
+
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit CopyCopyCopy", action: #selector(quit), keyEquivalent: "q"))
 
         menu.items.last?.target = self
@@ -89,6 +98,10 @@ final class StatusMenuController {
     @objc private func selectSeparator(_ sender: NSMenuItem) {
         guard let value = sender.representedObject as? String else { return }
         buffer.separator = value
+    }
+
+    @objc private func clearBuffer() {
+        onClearBuffer()
     }
 
     @objc private func quit() {
